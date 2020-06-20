@@ -2,8 +2,20 @@ import pygame
 import random
 
 class Bubble():
-    def _init_(self, x, y):
-        
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.speed = random.randint(1, 3)
+        self.pic = pygame.image.load('assets/Bubble.png')
+        self.on_screen = True
+
+        self.pic = pygame.transform.scale(self.pic, (15, 15))
+
+    def update(self, screen):
+        self.y -= self.speed
+        screen.blit(self.pic, (self.x, self.y))
+        if self.y < -self.pic.get_height():
+            self.on_screen = False
 
 class Enemy():
     def __init__(self, x, y, speed, size):
@@ -101,6 +113,10 @@ enemy_timer = enemy_timer_max
 enemies = []
 enemies_to_remove = []
 
+bubbles = []
+bubbles_to_remove = []
+bubble_timer = 0
+
 # ***************** Loop Land Below *****************
 # Everything under 'while running' will be repeated over and over again
 while running:
@@ -180,6 +196,24 @@ while running:
         enemy.update(screen)
         if enemy.x < -1000 or enemy.x > game_width+1000:
             enemies_to_remove.append(enemy)
+    
+    bubble_timer -= 1
+    if bubble_timer <= 0 and player_alive:
+        if player_facing_left:
+            bubbles.append(Bubble(player_x + player_size*1.25, player_y))
+        else:
+            bubbles.append(Bubble(player_x, player_y))
+        bubble_timer = random.randint(40, 90)
+
+    for bubble in bubbles:
+        if bubble.on_screen:
+            bubble.update(screen)
+        else:
+            bubbles_to_remove.append(bubble)
+
+    for bubble in bubbles_to_remove:
+        bubbles.remove(bubble)
+    bubbles_to_remove = []
     
     if player_alive:
         player_hitbox.x = player_x
