@@ -1,5 +1,7 @@
 import pygame
-import random
+import random   
+
+
 
 class Bubble():
     def __init__(self, x, y):
@@ -8,7 +10,6 @@ class Bubble():
         self.speed = random.randint(1, 3)
         self.pic = pygame.image.load('assets/Bubble.png')
         self.on_screen = True
-
         self.pic = pygame.transform.scale(self.pic, (15, 15))
 
     def update(self, screen):
@@ -73,8 +74,8 @@ running = True
 
 backround_pic = pygame.image.load("assets/Scene_A.png")
 background_pic2 = pygame.image.load('assets/Scene_B.png')
-player_pic = pygame.image.load("assets/zorez_close.png")
-player_pic2 = pygame.image.load("assets/zorez_close2withears.png")
+player_pic = pygame.image.load("assets/zorez_close1nowhitehair.png")
+player_pic2 = pygame.image.load("assets/zorez_closenowhitehair.png")
 player_eating_pic = pygame.image.load("assets/zorez_open2.png")
 
 player_eating_timer_max = 8
@@ -117,6 +118,13 @@ bubbles = []
 bubbles_to_remove = []
 bubble_timer = 0
 
+# initialize mixer
+# pygame.mixer.pre_init(44100, 16, 2, 4096) #frequency, size, channels, buffersize
+pygame.mixer.init()
+underwater = pygame.mixer.Sound('assets/underwater.wav')
+chomp = pygame.mixer.Sound('assets/chomp.wav')
+scream = pygame.mixer.Sound('assets/scream.wav')
+underwater.play(loops=-1)
 # ***************** Loop Land Below *****************
 # Everything under 'while running' will be repeated over and over again
 while running:
@@ -136,8 +144,8 @@ while running:
         player_speed_y += player_speed
     if keys[pygame.K_UP]:
         player_speed_y -= player_speed
-    if keys[pygame.K_SPACE]:
-        player_size += 10
+#    if keys[pygame.K_SPACE]:
+#        player_size += 10
     if player_speed_x > 1:
         player_speed_x -= 0.1
     if player_speed_x < -1:
@@ -180,7 +188,7 @@ while running:
     enemy_timer-=1
     if enemy_timer<=0:
         new_enemy_y = random.randint(0, game_height)
-        new_enemy_speed = random.randint(2, 3)
+        new_enemy_speed = random.randint(2, 5)
         new_enemy_size = random.randint(player_size/2, player_size*2)
         if random.randint(0, 1) == 0:
             enemies.append(Enemy(-new_enemy_size*2, new_enemy_y, new_enemy_speed, new_enemy_size))
@@ -229,8 +237,10 @@ while running:
                     player_size += 2
                     enemies.remove(enemy)
                     player_eating_timer = player_eating_timer_max
+                    chomp.play()
                 else:
                     player_alive = False
+                    scream.play()
 
         player_swimming_timer -= 1
         if player_swimming_timer <= 0:
